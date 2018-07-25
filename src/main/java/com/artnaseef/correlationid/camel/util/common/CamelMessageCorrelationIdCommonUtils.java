@@ -92,6 +92,11 @@ public class CamelMessageCorrelationIdCommonUtils {
       } else {
         this.log.debug("have correlation id from the incoming message headers: id={}", correlationIdObj);
       }
+
+      // If a correlation ID was found, add it to the exchange properties now since the exchange property was missing.
+      if (correlationIdObj != null) {
+        exchangeProperties.put(CORRELATION_ID_EXCHANGE_PROPERTY, correlationIdObj);
+      }
     } else {
       this.log.debug("have correlation id from the camel exchange: id={}", correlationIdObj);
     }
