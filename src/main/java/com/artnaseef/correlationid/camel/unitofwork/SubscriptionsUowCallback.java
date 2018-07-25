@@ -43,7 +43,11 @@ public class SubscriptionsUowCallback implements AsyncCallback {
   public void done(boolean doneSync) {
     if (!doneSync) {
       // Restore the thread original correlation Id
-      MDC.put(this.correlationIdHeader, this.originalCorrelationId);
+      if (this.originalCorrelationId != null) {
+        MDC.put(this.correlationIdHeader, this.originalCorrelationId);
+      } else {
+        MDC.remove(this.correlationIdHeader);
+      }
     }
 
     if (this.delegate != null) {
