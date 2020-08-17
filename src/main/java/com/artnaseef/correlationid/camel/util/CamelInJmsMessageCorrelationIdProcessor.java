@@ -30,6 +30,8 @@ import org.apache.camel.Processor;
 import org.slf4j.MDC;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Correlation ID handler for Camel routes.
@@ -87,8 +89,18 @@ public class CamelInJmsMessageCorrelationIdProcessor implements Processor {
       MDC.put(this.correlationIdUtils.getCorrelationIdHeaderName(), correlationId);
       exchangeProperties.put(CamelMessageCorrelationIdCommonUtils.CORRELATION_ID_EXCHANGE_PROPERTY, correlationId);
     } else {
+      @SuppressWarnings("unchecked")
+      Function<Exchange, String>
+          altCorrelationIdSupplier =
+          exchange.getProperty(CamelCorrelationIdConstants.ALT_CORRELATION_ID_SUPPLIER_PROP, Function.class);
+
+      Supplier<String> supplierWrapper = null;
+      if (altCorrelationIdSupplier != null) {
+        supplierWrapper = () -> altCorrelationIdSupplier.apply(exchange);
+      }
+
       // Fallback to the non-JMS logic
-      this.commonUtils.extractOrSetCorrelationId(messageHeaders, exchangeProperties, null);
+      this.commonUtils.extractOrSetCorrelationId(messageHeaders, exchangeProperties, supplierWrapper);
     }
   }
 }

@@ -35,10 +35,6 @@ import java.util.function.Supplier;
  */
 public class CamelInHttpMessageCorrelationIdHandler implements Processor {
 
-  public static final String
-      BODY_CORRELATION_ID_SUPPLIER_PROP =
-      "com.artnaseef.correlationid.util.body-supplier";
-
   private CorrelationIdUtils correlationIdUtils;
   private CamelMessageCorrelationIdCommonUtils commonUtils;
 
@@ -74,7 +70,7 @@ public class CamelInHttpMessageCorrelationIdHandler implements Processor {
     Map<String, Object> exchangeProperties = exchange.getProperties();
     Function<Exchange, String>
         bodyCorrelationIdSupplier =
-        exchange.getProperty(BODY_CORRELATION_ID_SUPPLIER_PROP, Function.class);
+        exchange.getProperty(CamelCorrelationIdConstants.ALT_CORRELATION_ID_SUPPLIER_PROP, Function.class);
 
     Supplier<String> supplierWrapper = null;
     if (bodyCorrelationIdSupplier != null) {
