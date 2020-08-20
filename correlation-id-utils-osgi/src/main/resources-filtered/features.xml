@@ -28,6 +28,11 @@
         <bundle>mvn:org.apache.camel/camel-core/${camel.version}</bundle>
     </feature>
 
+    <feature name="correlation-id-utils-cxf" version="${project.version}" description="Correlation ID Utils - Camel">
+        <feature version="${project.version}">correlation-id-utils-common</feature>
+        <bundle>mvn:org.apache.cxf/cxf-core/${cxf.version}</bundle>
+    </feature>
+
     <feature name="correlation-id-utils-common" version="${project.version}" description="Correlation ID Utils - Common">
         <bundle>mvn:com.fasterxml.uuid/java-uuid-generator/${java-uuid-generator.version}</bundle>
         <bundle>mvn:com.artnaseef/correlation-id-utils-common/${project.version}</bundle>
