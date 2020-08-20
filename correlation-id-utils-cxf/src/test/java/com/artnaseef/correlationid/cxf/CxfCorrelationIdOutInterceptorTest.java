@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class CxfCorrelationIdOutInterceptorTest {
     private Message mockMessage;
     private Message mockInMessage;
     private CorrelationIdUtils mockCorrelationIdUtils;
+    private Logger mockLog;
 
     private Map<String, List<String>> testProtocolHeaders = new TreeMap<>();
 
@@ -56,6 +58,7 @@ public class CxfCorrelationIdOutInterceptorTest {
         this.mockMessage = Mockito.mock(Message.class);
         this.mockInMessage = Mockito.mock(Message.class);
         this.mockCorrelationIdUtils = Mockito.mock(CorrelationIdUtils.class);
+        this.mockLog = Mockito.mock(Logger.class);
 
         Mockito.when(this.mockMessage.getExchange()).thenReturn(this.mockExchange);
         Mockito.when(this.mockMessage.get(PROTOCOL_HEADERS)).thenReturn(this.testProtocolHeaders);
@@ -69,6 +72,15 @@ public class CxfCorrelationIdOutInterceptorTest {
 
         this.outInterceptor.setCorrelationIdUtils(this.mockCorrelationIdUtils);
         assertSame(this.mockCorrelationIdUtils, this.outInterceptor.getCorrelationIdUtils());
+    }
+
+    @Test
+    public void testGetSetLog() {
+        assertNotNull(this.outInterceptor.getLog());
+        assertNotSame(this.mockLog, this.outInterceptor.getLog());
+
+        this.outInterceptor.setLog(this.mockLog);
+        assertSame(this.mockLog, this.outInterceptor.getLog());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -128,6 +140,33 @@ public class CxfCorrelationIdOutInterceptorTest {
 
         // Verify the supplier uses the correlation ID stored in the CXF exchange
         assertNull(correlationIdSupplierCaptor.getValue().get());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testMissingProtocolHeaders() {
+        //
+        // Setup Test Data and Interactions
+        //
+        Mockito.when(this.mockMessage.get(PROTOCOL_HEADERS)).thenReturn(null);
+        Mockito.when(this.mockCorrelationIdUtils.messageCorrelationIdFilterHandler(Mockito.any(Supplier.class), Mockito.eq(null))).thenReturn("x-correlation-id-x");
+
+        //
+        // Execute
+        //
+        this.outInterceptor.setCorrelationIdUtils(this.mockCorrelationIdUtils);
+        this.outInterceptor.setLog(this.mockLog);
+        this.outInterceptor.handleMessage(this.mockMessage);
+
+        // this.log.debug("cannot add correlation ID to protocol headers as they are missing from the message " +
+        //         "(wrong phase?): correlation-id={}", correlationId);
+
+        //
+        // Verify the Results
+        //
+        Mockito.verify(this.mockLog)
+                .debug("cannot add correlation ID to protocol headers as they are missing from the message " +
+                       "(wrong phase?): correlation-id={}", "x-correlation-id-x");
     }
 
     /**

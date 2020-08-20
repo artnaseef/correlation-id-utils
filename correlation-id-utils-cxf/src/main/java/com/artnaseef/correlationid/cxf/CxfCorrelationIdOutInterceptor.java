@@ -24,7 +24,7 @@ public class CxfCorrelationIdOutInterceptor extends AbstractPhaseInterceptor {
     private CorrelationIdUtils correlationIdUtils;
 
     public CxfCorrelationIdOutInterceptor() {
-        super(Phase.PRE_PROTOCOL);
+        super(Phase.POST_PROTOCOL);
     }
 
     public CxfCorrelationIdOutInterceptor(String phase) {
@@ -43,6 +43,14 @@ public class CxfCorrelationIdOutInterceptor extends AbstractPhaseInterceptor {
         this.correlationIdUtils = correlationIdUtils;
     }
 
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+
 //========================================
 // Message Processing
 //----------------------------------------
@@ -59,7 +67,12 @@ public class CxfCorrelationIdOutInterceptor extends AbstractPhaseInterceptor {
         String correlationIdheaderName = this.correlationIdUtils.getCorrelationIdHeaderName();
 
         Map<String, List<String>> headers = (Map) message.get(Message.PROTOCOL_HEADERS);
-        headers.put(correlationIdheaderName, Collections.singletonList(correlationId));
+        if (headers != null) {
+            headers.put(correlationIdheaderName, Collections.singletonList(correlationId));
+        } else {
+            this.log.debug("cannot add correlation ID to protocol headers as they are missing from the message " +
+                    "(wrong phase?): correlation-id={}", correlationId);
+        }
     }
 
     public String extractInMessageCorrelationId(Message message) {
