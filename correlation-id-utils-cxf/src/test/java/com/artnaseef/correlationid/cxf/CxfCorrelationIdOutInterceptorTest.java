@@ -30,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -164,9 +165,9 @@ public class CxfCorrelationIdOutInterceptorTest {
         //
         // Verify the Results
         //
-        Mockito.verify(this.mockLog)
-                .debug("cannot add correlation ID to protocol headers as they are missing from the message " +
-                       "(wrong phase?): correlation-id={}", "x-correlation-id-x");
+        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+        Mockito.verify(this.mockMessage).put(Mockito.eq(PROTOCOL_HEADERS), argumentCaptor.capture());
+        assertEquals(Arrays.asList("x-correlation-id-x"), argumentCaptor.getValue().get("x-header-x"));
     }
 
     /**

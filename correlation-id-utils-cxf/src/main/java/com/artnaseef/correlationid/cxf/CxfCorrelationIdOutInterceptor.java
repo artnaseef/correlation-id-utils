@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.artnaseef.correlationid.cxf.CxfCorrelationIdInInterceptor.CXF_CORRELATION_ID_STORE_NAME;
 
@@ -24,7 +25,7 @@ public class CxfCorrelationIdOutInterceptor extends AbstractPhaseInterceptor {
     private CorrelationIdUtils correlationIdUtils;
 
     public CxfCorrelationIdOutInterceptor() {
-        super(Phase.POST_PROTOCOL);
+        super(Phase.MARSHAL);
     }
 
     public CxfCorrelationIdOutInterceptor(String phase) {
@@ -67,12 +68,14 @@ public class CxfCorrelationIdOutInterceptor extends AbstractPhaseInterceptor {
         String correlationIdheaderName = this.correlationIdUtils.getCorrelationIdHeaderName();
 
         Map<String, List<String>> headers = (Map) message.get(Message.PROTOCOL_HEADERS);
-        if (headers != null) {
-            headers.put(correlationIdheaderName, Collections.singletonList(correlationId));
-        } else {
-            this.log.debug("cannot add correlation ID to protocol headers as they are missing from the message " +
-                    "(wrong phase?): correlation-id={}", correlationId);
+
+        // Copy-and-pasted from the CXF docs jax-rs-filters page.
+        if (headers == null) {
+            headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            message.put(Message.PROTOCOL_HEADERS, headers);
         }
+
+        headers.put(correlationIdheaderName, Collections.singletonList(correlationId));
     }
 
     public String extractInMessageCorrelationId(Message message) {
