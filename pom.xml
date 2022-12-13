@@ -40,7 +40,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <camel.version>3.2.0</camel.version>
-        <cxf.version>3.3.6</cxf.version>
+        <cxf.version>3.4.10</cxf.version>
         <guava.version>20.0</guava.version>
         <java-uuid-generator.version>4.0.1</java-uuid-generator.version>
     </properties>
