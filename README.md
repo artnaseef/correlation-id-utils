@@ -20,6 +20,14 @@
         <version>${correlation-id-utils.version}</version>
     </dependency>
 
+**Camel Utilities (v4)**
+       
+    <dependency>
+        <groupId>com.artnaseef</groupId>
+        <artifactId>correlation-id-utils-camel-v4</artifactId>
+        <version>${correlation-id-utils.version}</version>
+    </dependency>
+
 **OSGI (features file)**
 
     <dependency>
